@@ -1,0 +1,53 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node modules (dependencies)
+node_modules/
+
+# Build output (Vercel will generate its own build)
+build/
+
+# Local environment variables (do not expose API keys)
+.env
+.env.local
+.env.development
+.env.production
+
+# Vercel deployment files (local project settings)
+.vercel
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor-specific files (optional)
+.vscode/
+.idea/
+.DS_Store
+
+# OS-specific files (Mac/Linux/Windows)
+Thumbs.db
+
