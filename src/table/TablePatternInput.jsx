@@ -25,19 +25,19 @@ const TablePatternInput = () => {
       matrix: matrixData,
     };
 
-    try {
-      const res = await fetch("https://tableapimain.onrender.com/api/table-pattern-check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+       try {
+  const res = await fetch("https://tableapimain.onrender.com/api/table-pattern-check", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-      const data = await res.json();
-      setApiData(data); // ⭐ save backend output
-      setResponseMessage(data.message);
-    } catch (err) {
-      setResponseMessage("❌ Server Error!");
-    }
+  const data = await res.json();
+  setApiData(data); // ⭐ save backend output
+  setResponseMessage(data.message);
+} catch (err) {
+  setResponseMessage("❌ Server Error!");
+}
   };
 
   return (
