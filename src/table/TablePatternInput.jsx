@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DatabaseUpdate from "./ExtraTable";
-import ResultsDisplay from "./ResultDisplay"; // NEW
+import ResultsDisplay from "./ResultDisplay";
 
 const TablePatternInput = () => {
   const [selectedChart, setSelectedChart] = useState("kalyan_panel");
@@ -10,27 +10,28 @@ const TablePatternInput = () => {
   const [responseMessage, setResponseMessage] = useState("");
   const [apiData, setApiData] = useState(null);
 
-  const handleSubmit = async () => {
-    setResponseMessage("");
+  const API_URL = "https://tableapimain.onrender.com/api/table-pattern-check";
 
-    // 1️⃣ Validate Pattern input
+  const sendRequestToServer = async (payload) => {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Backend not responding");
+    }
+
+    return res.json();
+  };
+
+  const handleSubmit = async () => {
     if (!patternInput.trim()) {
       setResponseMessage("⚠ Enter Pattern!");
       return;
     }
 
-    if (!patternInput.includes(",")) {
-      setResponseMessage("⚠ Enter pattern like 4,0,6,7");
-      return;
-    }
-
-    // 2️⃣ Validate Table Loaded
-    if (!matrixData || matrixData.length === 0) {
-      setResponseMessage("⚠ Please wait for table to load!");
-      return;
-    }
-
-    // 3️⃣ Create request payload
     const payload = {
       chart: selectedChart,
       pattern: patternInput,
@@ -38,47 +39,38 @@ const TablePatternInput = () => {
       matrix: matrixData,
     };
 
+    setResponseMessage("⏳ Processing request, please wait...");
+
     try {
-      const res = await fetch(
-        "https://tableapimain.onrender.com/api/table-pattern-check",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        setResponseMessage("❌ Server unreachable!");
-        return;
-      }
-
-      const data = await res.json();
-
-      if (!data.status) {
-        setResponseMessage("❌ Pattern not matched!");
-        return;
-      }
-
+      // First try
+      const data = await sendRequestToServer(payload);
       setApiData(data);
-      setResponseMessage(data.message);
-
+      setResponseMessage("✅ Success!");
     } catch (err) {
-      console.log("API ERROR: ", err);
-      setResponseMessage("❌ Network/API Failed!");
+      // Backend may be sleeping — retry
+      console.warn("⚠ First request failed, retrying after wake-up...");
+
+      try {
+        setResponseMessage("⚡ Retrying...");
+        await new Promise((res) => setTimeout(res, 1200)); // wait 1 sec
+
+        const data = await sendRequestToServer(payload);
+        setApiData(data);
+        setResponseMessage("🔥 Response received after retry");
+      } catch (err2) {
+        console.log(err2);
+        setResponseMessage("❌ Server not responding. Try again.");
+      }
     }
   };
 
   return (
     <div className="p-4 max-w-xl mx-auto">
-      <h1
-        className="text-xl font-bold text-center"
-        style={{ color: "#6D0B3E" }}
-      >
+
+      <h1 className="text-xl font-bold text-center text-[#6D0B3E]">
         Table Pattern Input
       </h1>
 
-      {/* Chart Selection */}
       <select
         className="border p-2 w-full mt-4"
         value={selectedChart}
@@ -94,20 +86,18 @@ const TablePatternInput = () => {
         <option value="rajdhani_night">Rajdhani Night</option>
       </select>
 
-      {/* Weeks */}
       <select
-        className="border w-full p-2 mt-3"
+        className="border p-2 w-full mt-3"
         value={rowsToShow}
         onChange={(e) => setRowsToShow(+e.target.value)}
       >
-        {[5, 6, 7, 8, 9, 10, 15, 20, 30].map((n) => (
+        {[5, 6, 7, 8, 9, 10, 15, 20, 30].map(n => (
           <option key={n} value={n}>
             Last {n}
           </option>
         ))}
       </select>
 
-      {/* Table Component */}
       <div className="mt-4">
         <DatabaseUpdate
           selectedChart={selectedChart}
@@ -116,15 +106,13 @@ const TablePatternInput = () => {
         />
       </div>
 
-      {/* Pattern input */}
       <input
         className="border w-full p-2 mt-4"
-        placeholder="Enter Pattern (e.g. 4,0,6,7)"
+        placeholder="Enter Pattern separated by commas"
         value={patternInput}
         onChange={(e) => setPatternInput(e.target.value)}
       />
 
-      {/* Submit Buttons */}
       <div className="mt-4 flex justify-center gap-3">
         <button
           className="bg-[#6D0B3E] text-white px-5 py-2 rounded"
@@ -144,14 +132,12 @@ const TablePatternInput = () => {
         </button>
       </div>
 
-      {/* Response Message */}
       {responseMessage && (
-        <p className="text-green-700 font-bold text-center mt-4">
+        <p className="font-bold text-center mt-4">
           {responseMessage}
         </p>
       )}
 
-      {/* Display API Results */}
       {apiData && (
         <div className="mt-6">
           <ResultsDisplay apiData={apiData} />
