@@ -26,7 +26,7 @@ const TablePatternInput = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/table-pattern-check", {
+      const res = await fetch("https://tableapimain.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
