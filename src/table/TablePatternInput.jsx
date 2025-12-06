@@ -10,10 +10,10 @@ const TablePatternInput = () => {
   const [responseMessage, setResponseMessage] = useState("");
   const [apiData, setApiData] = useState(null);
 
-  const API_URL = "https://tableapimain.onrender.com/api/table-pattern-check";
+  const API_URL = "https://tableapimain-1.onrender.com/api/table-pattern-check";
 
   const sendRequestToServer = async (payload) => {
-    const res = await fetch(API_URL, {
+    const res = await fetch(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
